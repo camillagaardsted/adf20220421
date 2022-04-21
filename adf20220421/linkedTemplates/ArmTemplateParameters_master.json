@@ -5,20 +5,20 @@
 		"factoryName": {
 			"value": "adf20220421"
 		},
+		"AzureSynapseAnalytics_connectionString": {
+			"value": ""
+		},
 		"asacosmosdb01_connectionString": {
 			"value": ""
 		},
-		"AzureSynapseAnalytics_connectionString": {
-			"value": ""
+		"asadatalakexxxxxxx_properties_typeProperties_url": {
+			"value": "https://asadatalakepki1ben.dfs.core.windows.net"
 		},
 		"corona datalake container_properties_typeProperties_url": {
 			"value": "https://datalakesu20220419.dfs.core.windows.net"
 		},
 		"http til ssi_properties_typeProperties_url": {
 			"value": "https://files.ssi.dk/covid19/overvagning/data/"
-		},
-		"asadatalakexxxxxxx_properties_typeProperties_url": {
-			"value": "https://asadatalakepki1ben.dfs.core.windows.net"
 		},
 		"containerUri": {
 			"value": ""

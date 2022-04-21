@@ -7,13 +7,17 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "adf20220421"
 		},
+		"AzureSynapseAnalytics_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'AzureSynapseAnalytics'"
+		},
 		"asacosmosdb01_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'asacosmosdb01'"
 		},
-		"AzureSynapseAnalytics_connectionString": {
-			"type": "secureString",
-			"metadata": "Secure string for 'connectionString' of 'AzureSynapseAnalytics'"
+		"asadatalakexxxxxxx_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://asadatalakepki1ben.dfs.core.windows.net"
 		},
 		"corona datalake container_properties_typeProperties_url": {
 			"type": "string",
@@ -22,10 +26,6 @@
 		"http til ssi_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://files.ssi.dk/covid19/overvagning/data/"
-		},
-		"asadatalakexxxxxxx_properties_typeProperties_url": {
-			"type": "string",
-			"defaultValue": "https://asadatalakepki1ben.dfs.core.windows.net"
 		}
 	},
 	"variables": {
@@ -33,29 +33,14 @@
 	},
 	"resources": [
 		{
-			"name": "[concat(parameters('factoryName'), '/corona datalake container')]",
+			"name": "[concat(parameters('factoryName'), '/AzureSynapseAnalytics')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"annotations": [],
-				"type": "AzureBlobFS",
+				"type": "AzureSqlDW",
 				"typeProperties": {
-					"url": "[parameters('corona datalake container_properties_typeProperties_url')]"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/http til ssi')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "HttpServer",
-				"typeProperties": {
-					"url": "[parameters('http til ssi_properties_typeProperties_url')]",
-					"enableServerCertificateValidation": true,
-					"authenticationType": "Anonymous"
+					"connectionString": "[parameters('AzureSynapseAnalytics_connectionString')]"
 				}
 			},
 			"dependsOn": []
@@ -87,106 +72,40 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/AzureSynapseAnalytics')]",
+			"name": "[concat(parameters('factoryName'), '/corona datalake container')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"annotations": [],
-				"type": "AzureSqlDW",
+				"type": "AzureBlobFS",
 				"typeProperties": {
-					"connectionString": "[parameters('AzureSynapseAnalytics_connectionString')]"
+					"url": "[parameters('corona datalake container_properties_typeProperties_url')]"
 				}
 			},
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/covid19json')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
+			"name": "[concat(parameters('factoryName'), '/http til ssi')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
 			"properties": {
-				"linkedServiceName": {
-					"referenceName": "corona datalake container",
-					"type": "LinkedServiceReference"
-				},
 				"annotations": [],
-				"type": "Json",
+				"type": "HttpServer",
 				"typeProperties": {
-					"location": {
-						"type": "AzureBlobFSLocation",
-						"folderPath": "jsondata",
-						"fileSystem": "corona"
-					}
-				},
-				"schema": {}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/corona datalake container')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/covid19zipfile')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "http til ssi",
-					"type": "LinkedServiceReference"
-				},
-				"parameters": {
-					"dailyfilename": {
-						"type": "string",
-						"defaultValue": "overvaagningsdata-covid19-11082021-vu5q"
-					}
-				},
-				"annotations": [],
-				"type": "Binary",
-				"typeProperties": {
-					"location": {
-						"type": "HttpServerLocation",
-						"relativeUrl": {
-							"value": "@dataset().dailyfilename",
-							"type": "Expression"
-						}
-					},
-					"compression": {
-						"type": "ZipDeflate",
-						"level": "Optimal"
-					}
+					"url": "[parameters('http til ssi_properties_typeProperties_url')]",
+					"enableServerCertificateValidation": true,
+					"authenticationType": "Anonymous"
 				}
 			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/http til ssi')]"
-			]
+			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/csv_files_in_datalake')]",
+			"name": "[concat(parameters('factoryName'), '/asal400_campaign_analytics_source')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"linkedServiceName": {
-					"referenceName": "corona datalake container",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "Binary",
-				"typeProperties": {
-					"location": {
-						"type": "AzureBlobFSLocation",
-						"fileSystem": "corona"
-					}
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/corona datalake container')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/positive_over_tid_csv_fil')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "corona datalake container",
+					"referenceName": "asadatalakexxxxxxx",
 					"type": "LinkedServiceReference"
 				},
 				"annotations": [],
@@ -194,73 +113,43 @@
 				"typeProperties": {
 					"location": {
 						"type": "AzureBlobFSLocation",
-						"fileName": "Test_pos_over_time.csv",
-						"folderPath": "overvaagningsdata-covid19-20042022-p2vl",
-						"fileSystem": "corona"
+						"fileName": "campaignanalytics.csv",
+						"folderPath": "campaign-analytics",
+						"fileSystem": "wwi-02"
 					},
-					"columnDelimiter": ";",
+					"columnDelimiter": ",",
 					"escapeChar": "\\",
-					"firstRowAsHeader": true,
 					"quoteChar": "\""
 				},
 				"schema": [
 					{
-						"name": "Date",
 						"type": "String"
 					},
 					{
-						"name": "NewPositive",
 						"type": "String"
 					},
 					{
-						"name": "NotPrevPos",
 						"type": "String"
 					},
 					{
-						"name": "PosPct",
 						"type": "String"
 					},
 					{
-						"name": "PrevPos",
 						"type": "String"
 					},
 					{
-						"name": "Tested",
 						"type": "String"
 					},
 					{
-						"name": "Tested_kumulativ",
+						"type": "String"
+					},
+					{
 						"type": "String"
 					}
 				]
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/corona datalake container')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/ssi_zip_file')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "http til ssi",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "Binary",
-				"typeProperties": {
-					"location": {
-						"type": "HttpServerLocation",
-						"relativeUrl": "overvaagningsdata-covid19-20042022-p2vl"
-					},
-					"compression": {
-						"type": "ZipDeflate"
-					}
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/http til ssi')]"
+				"[concat(variables('factoryId'), '/linkedServices/asadatalakexxxxxxx')]"
 			]
 		},
 		{
@@ -465,12 +354,93 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/asal400_campaign_analytics_source')]",
+			"name": "[concat(parameters('factoryName'), '/covid19json')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"linkedServiceName": {
-					"referenceName": "asadatalakexxxxxxx",
+					"referenceName": "corona datalake container",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Json",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": "jsondata",
+						"fileSystem": "corona"
+					}
+				},
+				"schema": {}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/corona datalake container')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/covid19zipfile')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "http til ssi",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"dailyfilename": {
+						"type": "string",
+						"defaultValue": "overvaagningsdata-covid19-11082021-vu5q"
+					}
+				},
+				"annotations": [],
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "HttpServerLocation",
+						"relativeUrl": {
+							"value": "@dataset().dailyfilename",
+							"type": "Expression"
+						}
+					},
+					"compression": {
+						"type": "ZipDeflate",
+						"level": "Optimal"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/http til ssi')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/csv_files_in_datalake')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "corona datalake container",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileSystem": "corona"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/corona datalake container')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/positive_over_tid_csv_fil')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "corona datalake container",
 					"type": "LinkedServiceReference"
 				},
 				"annotations": [],
@@ -478,43 +448,73 @@
 				"typeProperties": {
 					"location": {
 						"type": "AzureBlobFSLocation",
-						"fileName": "campaignanalytics.csv",
-						"folderPath": "campaign-analytics",
-						"fileSystem": "wwi-02"
+						"fileName": "Test_pos_over_time.csv",
+						"folderPath": "overvaagningsdata-covid19-20042022-p2vl",
+						"fileSystem": "corona"
 					},
-					"columnDelimiter": ",",
+					"columnDelimiter": ";",
 					"escapeChar": "\\",
+					"firstRowAsHeader": true,
 					"quoteChar": "\""
 				},
 				"schema": [
 					{
+						"name": "Date",
 						"type": "String"
 					},
 					{
+						"name": "NewPositive",
 						"type": "String"
 					},
 					{
+						"name": "NotPrevPos",
 						"type": "String"
 					},
 					{
+						"name": "PosPct",
 						"type": "String"
 					},
 					{
+						"name": "PrevPos",
 						"type": "String"
 					},
 					{
+						"name": "Tested",
 						"type": "String"
 					},
 					{
-						"type": "String"
-					},
-					{
+						"name": "Tested_kumulativ",
 						"type": "String"
 					}
 				]
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/asadatalakexxxxxxx')]"
+				"[concat(variables('factoryId'), '/linkedServices/corona datalake container')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ssi_zip_file')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "http til ssi",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "HttpServerLocation",
+						"relativeUrl": "overvaagningsdata-covid19-20042022-p2vl"
+					},
+					"compression": {
+						"type": "ZipDeflate"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/http til ssi')]"
 			]
 		},
 		{
@@ -724,7 +724,7 @@
 						"typeProperties": {
 							"variableName": "currentDate",
 							"value": {
-								"value": "@formatDateTime(adddays(utcnow(),-2),'ddMMyyyy')",
+								"value": "@formatDateTime(adddays(utcnow(),-0),'ddMMyyyy')",
 								"type": "Expression"
 							}
 						}
@@ -752,96 +752,6 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/covid19zipfile')]",
 				"[concat(variables('factoryId'), '/datasets/csv_files_in_datalake')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/power query transform csv')]",
-			"type": "Microsoft.DataFactory/factories/dataflows",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"type": "WranglingDataFlow",
-				"typeProperties": {
-					"sources": [
-						{
-							"name": "positive_over_tid_csv_fil",
-							"script": "source(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> positive_over_tid_csv_fil",
-							"dataset": {
-								"referenceName": "positive_over_tid_csv_fil",
-								"type": "DatasetReference"
-							}
-						}
-					],
-					"script": "section Section1;\r\nshared positive_over_tid_csv_fil = let AdfDoc = AzureStorage.DataLakeContents(\"https://datalakesu20220419.dfs.core.windows.net/corona/overvaagningsdata-covid19-20042022-p2vl/Test_pos_over_time.csv\"),Csv = Csv.Document(AdfDoc, [Delimiter = \";\", Encoding = TextEncoding.Utf8, QuoteStyle = QuoteStyle.Csv]), PromotedHeaders = Table.PromoteHeaders(Csv, [PromoteAllScalars = true]) in  PromotedHeaders;\r\nshared UserQuery = let Source = #\"positive_over_tid_csv_fil\",\r\n  #\"Removed other columns\" = Table.SelectColumns(Source, {\"Date\", \"NewPositive\", \"PosPct\"}) in #\"Removed other columns\";\r\n",
-					"documentLocale": "en-us"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/positive_over_tid_csv_fil')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/transformer positive over tid csv fil')]",
-			"type": "Microsoft.DataFactory/factories/dataflows",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"type": "MappingDataFlow",
-				"typeProperties": {
-					"sources": [
-						{
-							"dataset": {
-								"referenceName": "positive_over_tid_csv_fil",
-								"type": "DatasetReference"
-							},
-							"name": "source1"
-						}
-					],
-					"sinks": [
-						{
-							"dataset": {
-								"referenceName": "covid19json",
-								"type": "DatasetReference"
-							},
-							"name": "csvdatadestination"
-						}
-					],
-					"transformations": [
-						{
-							"name": "select1"
-						}
-					],
-					"scriptLines": [
-						"source(output(",
-						"          Date as date,",
-						"          NewPositive as double,",
-						"          NotPrevPos as double,",
-						"          PosPct as string,",
-						"          PrevPos as double,",
-						"          Tested as double,",
-						"          Tested_kumulativ as string",
-						"     ),",
-						"     allowSchemaDrift: true,",
-						"     validateSchema: false,",
-						"     ignoreNoFilesFound: false) ~> source1",
-						"source1 select(mapColumn(",
-						"          Dato = Date,",
-						"          NyePositive = NewPositive,",
-						"          PosPct",
-						"     ),",
-						"     skipDuplicateMapInputs: true,",
-						"     skipDuplicateMapOutputs: true) ~> select1",
-						"select1 sink(allowSchemaDrift: true,",
-						"     validateSchema: false,",
-						"     umask: 0022,",
-						"     preCommands: [],",
-						"     postCommands: [],",
-						"     skipDuplicateMapInputs: true,",
-						"     skipDuplicateMapOutputs: true) ~> csvdatadestination"
-					]
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/positive_over_tid_csv_fil')]",
-				"[concat(variables('factoryId'), '/datasets/covid19json')]"
 			]
 		},
 		{
@@ -952,6 +862,96 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/asal400_campaign_analytics_source')]",
 				"[concat(variables('factoryId'), '/datasets/asal400_wwi_campaign_analytics_asa')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/power query transform csv')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "WranglingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"name": "positive_over_tid_csv_fil",
+							"script": "source(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> positive_over_tid_csv_fil",
+							"dataset": {
+								"referenceName": "positive_over_tid_csv_fil",
+								"type": "DatasetReference"
+							}
+						}
+					],
+					"script": "section Section1;\r\nshared positive_over_tid_csv_fil = let AdfDoc = AzureStorage.DataLakeContents(\"https://datalakesu20220419.dfs.core.windows.net/corona/overvaagningsdata-covid19-20042022-p2vl/Test_pos_over_time.csv\"),Csv = Csv.Document(AdfDoc, [Delimiter = \";\", Encoding = TextEncoding.Utf8, QuoteStyle = QuoteStyle.Csv]), PromotedHeaders = Table.PromoteHeaders(Csv, [PromoteAllScalars = true]) in  PromotedHeaders;\r\nshared UserQuery = let Source = #\"positive_over_tid_csv_fil\",\r\n  #\"Removed other columns\" = Table.SelectColumns(Source, {\"Date\", \"NewPositive\", \"PosPct\"}) in #\"Removed other columns\";\r\n",
+					"documentLocale": "en-us"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/positive_over_tid_csv_fil')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/transformer positive over tid csv fil')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "positive_over_tid_csv_fil",
+								"type": "DatasetReference"
+							},
+							"name": "source1"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "covid19json",
+								"type": "DatasetReference"
+							},
+							"name": "csvdatadestination"
+						}
+					],
+					"transformations": [
+						{
+							"name": "select1"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          Date as date,",
+						"          NewPositive as double,",
+						"          NotPrevPos as double,",
+						"          PosPct as string,",
+						"          PrevPos as double,",
+						"          Tested as double,",
+						"          Tested_kumulativ as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> source1",
+						"source1 select(mapColumn(",
+						"          Dato = Date,",
+						"          NyePositive = NewPositive,",
+						"          PosPct",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> select1",
+						"select1 sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     umask: 0022,",
+						"     preCommands: [],",
+						"     postCommands: [],",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> csvdatadestination"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/positive_over_tid_csv_fil')]",
+				"[concat(variables('factoryId'), '/datasets/covid19json')]"
 			]
 		}
 	]

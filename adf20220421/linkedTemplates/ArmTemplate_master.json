@@ -7,13 +7,17 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "adf20220421"
 		},
+		"AzureSynapseAnalytics_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'AzureSynapseAnalytics'"
+		},
 		"asacosmosdb01_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'asacosmosdb01'"
 		},
-		"AzureSynapseAnalytics_connectionString": {
-			"type": "secureString",
-			"metadata": "Secure string for 'connectionString' of 'AzureSynapseAnalytics'"
+		"asadatalakexxxxxxx_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://asadatalakepki1ben.dfs.core.windows.net"
 		},
 		"corona datalake container_properties_typeProperties_url": {
 			"type": "string",
@@ -22,10 +26,6 @@
 		"http til ssi_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://files.ssi.dk/covid19/overvagning/data/"
-		},
-		"asadatalakexxxxxxx_properties_typeProperties_url": {
-			"type": "string",
-			"defaultValue": "https://asadatalakepki1ben.dfs.core.windows.net"
 		},
 		"containerUri": {
 			"type": "string",
@@ -54,20 +54,20 @@
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
 					},
+					"AzureSynapseAnalytics_connectionString": {
+						"value": "[parameters('AzureSynapseAnalytics_connectionString')]"
+					},
 					"asacosmosdb01_connectionString": {
 						"value": "[parameters('asacosmosdb01_connectionString')]"
 					},
-					"AzureSynapseAnalytics_connectionString": {
-						"value": "[parameters('AzureSynapseAnalytics_connectionString')]"
+					"asadatalakexxxxxxx_properties_typeProperties_url": {
+						"value": "[parameters('asadatalakexxxxxxx_properties_typeProperties_url')]"
 					},
 					"corona datalake container_properties_typeProperties_url": {
 						"value": "[parameters('corona datalake container_properties_typeProperties_url')]"
 					},
 					"http til ssi_properties_typeProperties_url": {
 						"value": "[parameters('http til ssi_properties_typeProperties_url')]"
-					},
-					"asadatalakexxxxxxx_properties_typeProperties_url": {
-						"value": "[parameters('asadatalakexxxxxxx_properties_typeProperties_url')]"
 					}
 				}
 			},
