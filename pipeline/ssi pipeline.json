@@ -101,6 +101,15 @@
 					},
 					"enableStaging": false
 				},
+				"inputs": [
+					{
+						"referenceName": "covid19zipfile",
+						"type": "DatasetReference",
+						"parameters": {
+							"dailyfilename": "overvaagningsdata-covid19-11082021-vu5q"
+						}
+					}
+				],
 				"outputs": [
 					{
 						"referenceName": "csv_files_in_datalake",
