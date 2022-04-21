@@ -1,0 +1,10 @@
+{
+	"name": "asadatalakexxxxxxx",
+	"properties": {
+		"annotations": [],
+		"type": "AzureBlobFS",
+		"typeProperties": {
+			"url": "https://asadatalakepki1ben.dfs.core.windows.net"
+		}
+	}
+}
