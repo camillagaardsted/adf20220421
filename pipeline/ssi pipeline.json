@@ -93,8 +93,20 @@
 							}
 						}
 					},
+					"sink": {
+						"type": "BinarySink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						}
+					},
 					"enableStaging": false
-				}
+				},
+				"outputs": [
+					{
+						"referenceName": "csv_files_in_datalake",
+						"type": "DatasetReference"
+					}
+				]
 			},
 			{
 				"name": "Set current date",
