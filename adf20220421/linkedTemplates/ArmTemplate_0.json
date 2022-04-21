@@ -697,7 +697,10 @@
 								"referenceName": "covid19zipfile",
 								"type": "DatasetReference",
 								"parameters": {
-									"dailyfilename": "overvaagningsdata-covid19-11082021-vu5q"
+									"dailyfilename": {
+										"value": "@variables('zipfilename')",
+										"type": "Expression"
+									}
 								}
 							}
 						],
