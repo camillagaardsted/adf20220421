@@ -19,6 +19,13 @@
 						"referenceName": "user_profiles_to_datalake",
 						"type": "DataFlowReference"
 					},
+					"staging": {
+						"linkedService": {
+							"referenceName": "asadatalakexxxxxxx",
+							"type": "LinkedServiceReference"
+						},
+						"folderPath": "staging"
+					},
 					"compute": {
 						"coreCount": 8,
 						"computeType": "General"
