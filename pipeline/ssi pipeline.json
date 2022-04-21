@@ -151,10 +151,6 @@
 			"currentDate": {
 				"type": "String",
 				"defaultValue": "12082021"
-			},
-			"test": {
-				"type": "String",
-				"defaultValue": "3"
 			}
 		},
 		"annotations": [],
