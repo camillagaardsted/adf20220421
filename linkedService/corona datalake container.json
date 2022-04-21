@@ -1,0 +1,11 @@
+{
+	"name": "corona datalake container",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"annotations": [],
+		"type": "AzureBlobFS",
+		"typeProperties": {
+			"url": "https://datalakesu20220419.dfs.core.windows.net"
+		}
+	}
+}

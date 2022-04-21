@@ -1,0 +1,59 @@
+{
+	"name": "transformer positive over tid csv fil",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "positive_over_tid_csv_fil",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "covid19json",
+						"type": "DatasetReference"
+					},
+					"name": "csvdatadestination"
+				}
+			],
+			"transformations": [
+				{
+					"name": "select1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          Date as date,",
+				"          NewPositive as double,",
+				"          NotPrevPos as double,",
+				"          PosPct as string,",
+				"          PrevPos as double,",
+				"          Tested as double,",
+				"          Tested_kumulativ as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> source1",
+				"source1 select(mapColumn(",
+				"          Dato = Date,",
+				"          NyePositive = NewPositive,",
+				"          PosPct",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"select1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> csvdatadestination"
+			]
+		}
+	}
+}

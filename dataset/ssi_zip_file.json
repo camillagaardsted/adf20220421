@@ -1,0 +1,21 @@
+{
+	"name": "ssi_zip_file",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "http til ssi",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Binary",
+		"typeProperties": {
+			"location": {
+				"type": "HttpServerLocation",
+				"relativeUrl": "overvaagningsdata-covid19-20042022-p2vl"
+			},
+			"compression": {
+				"type": "ZipDeflate"
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}
