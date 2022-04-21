@@ -7,6 +7,14 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "adf20220421"
 		},
+		"asacosmosdb01_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'asacosmosdb01'"
+		},
+		"AzureSynapseAnalytics_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'AzureSynapseAnalytics'"
+		},
 		"corona datalake container_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://datalakesu20220419.dfs.core.windows.net"
@@ -14,6 +22,10 @@
 		"http til ssi_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://files.ssi.dk/covid19/overvagning/data/"
+		},
+		"asadatalakexxxxxxx_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://asadatalakepki1ben.dfs.core.windows.net"
 		},
 		"containerUri": {
 			"type": "string",
@@ -42,15 +54,44 @@
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
 					},
+					"asacosmosdb01_connectionString": {
+						"value": "[parameters('asacosmosdb01_connectionString')]"
+					},
+					"AzureSynapseAnalytics_connectionString": {
+						"value": "[parameters('AzureSynapseAnalytics_connectionString')]"
+					},
 					"corona datalake container_properties_typeProperties_url": {
 						"value": "[parameters('corona datalake container_properties_typeProperties_url')]"
 					},
 					"http til ssi_properties_typeProperties_url": {
 						"value": "[parameters('http til ssi_properties_typeProperties_url')]"
+					},
+					"asadatalakexxxxxxx_properties_typeProperties_url": {
+						"value": "[parameters('asadatalakexxxxxxx_properties_typeProperties_url')]"
 					}
 				}
 			},
 			"dependsOn": []
+		},
+		{
+			"name": "adf20220421_ArmTemplate_1",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2018-02-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_1.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					}
+				}
+			},
+			"dependsOn": [
+				"[resourceId('Microsoft.Resources/deployments', 'adf20220421_ArmTemplate_0')]"
+			]
 		}
 	]
 }

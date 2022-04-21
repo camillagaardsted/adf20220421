@@ -7,6 +7,14 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "adf20220421"
 		},
+		"asacosmosdb01_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'asacosmosdb01'"
+		},
+		"AzureSynapseAnalytics_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'AzureSynapseAnalytics'"
+		},
 		"corona datalake container_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://datalakesu20220419.dfs.core.windows.net"
@@ -14,6 +22,10 @@
 		"http til ssi_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://files.ssi.dk/covid19/overvagning/data/"
+		},
+		"asadatalakexxxxxxx_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://asadatalakepki1ben.dfs.core.windows.net"
 		}
 	},
 	"variables": {
@@ -686,6 +698,409 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/pipelines/ssi pipeline')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/asacosmosdb01')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "CosmosDb",
+				"typeProperties": {
+					"connectionString": "[parameters('asacosmosdb01_connectionString')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/asal400_customerprofile_cosmosdb')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "asacosmosdb01",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "CosmosDbSqlApiCollection",
+				"schema": {
+					"type": "object",
+					"properties": {
+						"userId": {
+							"type": "integer"
+						},
+						"cartId": {
+							"type": "string"
+						},
+						"preferredProducts": {
+							"type": "array",
+							"items": {
+								"type": "integer"
+							}
+						},
+						"productReviews": {
+							"type": "array",
+							"items": {
+								"type": "object",
+								"properties": {
+									"productId": {
+										"type": "integer"
+									},
+									"reviewText": {
+										"type": "string"
+									},
+									"reviewDate": {
+										"type": "string"
+									}
+								}
+							}
+						}
+					}
+				},
+				"typeProperties": {
+					"collectionName": "OnlineUserProfile01"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/asacosmosdb01')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/asadatalakexxxxxxx')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobFS",
+				"typeProperties": {
+					"url": "[parameters('asadatalakexxxxxxx_properties_typeProperties_url')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/asal400_ecommerce_userprofiles_source')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "asadatalakexxxxxxx",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Json",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": "online-user-profiles-02",
+						"fileSystem": "wwi-02"
+					}
+				},
+				"schema": {
+					"type": "object",
+					"properties": {
+						"visitorId": {
+							"type": "integer"
+						},
+						"topProductPurchases": {
+							"type": "array",
+							"items": {
+								"type": "object",
+								"properties": {
+									"productId": {
+										"type": "integer"
+									},
+									"itemsPurchasedLast12Months": {
+										"type": "integer"
+									}
+								}
+							}
+						}
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/asadatalakexxxxxxx')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/AzureSynapseAnalytics')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDW",
+				"typeProperties": {
+					"connectionString": "[parameters('AzureSynapseAnalytics_connectionString')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/asal400_wwi_campaign_analytics_asa')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSynapseAnalytics",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlDWTable",
+				"schema": [
+					{
+						"name": "Region",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Country",
+						"type": "nvarchar"
+					},
+					{
+						"name": "ProductCategory",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CampaignName",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Revenue",
+						"type": "decimal",
+						"precision": 10,
+						"scale": 2
+					},
+					{
+						"name": "RevenueTarget",
+						"type": "decimal",
+						"precision": 10,
+						"scale": 2
+					},
+					{
+						"name": "City",
+						"type": "nvarchar"
+					},
+					{
+						"name": "State",
+						"type": "nvarchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "wwi",
+					"table": "CampaignAnalytics"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureSynapseAnalytics')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/asal400_wwi_usertopproductpurchases_asa')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSynapseAnalytics",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlDWTable",
+				"schema": [
+					{
+						"name": "UserId",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "ProductId",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "ItemsPurchasedLast12Months",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "IsTopProduct",
+						"type": "bit"
+					},
+					{
+						"name": "IsPreferredProduct",
+						"type": "bit"
+					}
+				],
+				"typeProperties": {
+					"schema": "wwi",
+					"table": "UserTopProductPurchases"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureSynapseAnalytics')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/asal400_campaign_analytics_source')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "asadatalakexxxxxxx",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "campaignanalytics.csv",
+						"folderPath": "campaign-analytics",
+						"fileSystem": "wwi-02"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/asadatalakexxxxxxx')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/asal400_lab2_writecampaignanalyticstoasa')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "asal400_campaign_analytics_source",
+								"type": "DatasetReference"
+							},
+							"name": "CampaignAnalytics"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "asal400_wwi_campaign_analytics_asa",
+								"type": "DatasetReference"
+							},
+							"name": "CampaignAnalyticsASA"
+						}
+					],
+					"transformations": [
+						{
+							"name": "MapCampaignAnalytics"
+						},
+						{
+							"name": "ConvertColumnTypesAndValues"
+						},
+						{
+							"name": "SelectCampaignAnalyticsColumns"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          {_col0_} as string,",
+						"          {_col1_} as string,",
+						"          {_col2_} as string,",
+						"          {_col3_} as string,",
+						"          {_col4_} as string,",
+						"          {_col5_} as double,",
+						"          {_col6_} as string,",
+						"          {_col7_} as double,",
+						"          {_col8_} as string,",
+						"          {_col9_} as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false,",
+						"     skipLines: 1) ~> CampaignAnalytics",
+						"CampaignAnalytics select(mapColumn(",
+						"          Region = {_col0_},",
+						"          Country = {_col1_},",
+						"          ProductCategory = {_col2_},",
+						"          CampaignName = {_col3_},",
+						"          RevenuePart1 = {_col4_},",
+						"          Revenue = {_col5_},",
+						"          RevenueTargetPart1 = {_col6_},",
+						"          RevenueTarget = {_col7_},",
+						"          City = {_col8_},",
+						"          State = {_col9_}",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> MapCampaignAnalytics",
+						"MapCampaignAnalytics derive(Revenue = toDecimal(replace(concat(toString(RevenuePart1), toString(Revenue)), '\\\\', ''), 10, 2, '$###,###.##'),",
+						"          RevenueTarget = toDecimal(replace(concat(toString(RevenueTargetPart1), toString(RevenueTarget)), '\\\\', ''), 10, 2, '$###,###.##')) ~> ConvertColumnTypesAndValues",
+						"ConvertColumnTypesAndValues select(mapColumn(",
+						"          Region,",
+						"          Country,",
+						"          ProductCategory,",
+						"          CampaignName,",
+						"          Revenue,",
+						"          RevenueTarget,",
+						"          City,",
+						"          State",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> SelectCampaignAnalyticsColumns",
+						"SelectCampaignAnalyticsColumns sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     input(",
+						"          Region as string,",
+						"          Country as string,",
+						"          ProductCategory as string,",
+						"          CampaignName as string,",
+						"          Revenue as decimal(10,2),",
+						"          RevenueTarget as decimal(10,2),",
+						"          City as string,",
+						"          State as string",
+						"     ),",
+						"     deletable:false,",
+						"     insertable:true,",
+						"     updateable:false,",
+						"     upsertable:false,",
+						"     truncate:true,",
+						"     format: 'table',",
+						"     staged: false,",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> CampaignAnalyticsASA"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/asal400_campaign_analytics_source')]",
+				"[concat(variables('factoryId'), '/datasets/asal400_wwi_campaign_analytics_asa')]"
 			]
 		}
 	]
